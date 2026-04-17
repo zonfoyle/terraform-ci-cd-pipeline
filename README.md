@@ -1,31 +1,12 @@
 # Terraform CI/CD Pipeline
 
-Automated CI/CD pipeline for Terraform infrastructure using GitHub Actions.
+This project uses GitHub Actions to automatically validate Terraform code every time changes are pushed to the repository or a pull request is opened.
 
-This project demonstrates how Infrastructure as Code can be automatically checked and validated on every code change before deployment.
+The goal was to create a simple CI/CD workflow that catches Terraform issues early before infrastructure changes are deployed.
 
-## Features
+## What the Pipeline Does
 
-- Automated Terraform validation with GitHub Actions
-- Runs on every push and pull request to `main`
-- Checks Terraform formatting
-- Initializes Terraform
-- Validates Terraform configuration
-- Uses Infrastructure as Code best practices
-
-## Infrastructure Created
-
-This Terraform project provisions:
-
-- AWS VPC
-- DNS support
-- DNS hostnames
-- Tagged infrastructure resources
-- Terraform outputs
-
-## GitHub Actions Workflow
-
-The pipeline automatically runs the following commands:
+Every time code is pushed to `main` or included in a pull request, GitHub Actions runs:
 
 ```bash
 terraform fmt -check
@@ -33,13 +14,31 @@ terraform init -backend=false
 terraform validate
 ```
 
-## Workflow Steps
+These checks make sure the Terraform code is formatted correctly, can initialize successfully, and does not contain syntax or configuration errors.
 
-1. Checkout repository
-2. Install Terraform
-3. Check Terraform formatting
-4. Initialize Terraform
-5. Validate Terraform configuration
+## Why I Chose These Checks
+
+I started with these three commands because they provide the biggest value with the least complexity:
+
+- `terraform fmt -check` keeps the Terraform files consistently formatted
+- `terraform init -backend=false` verifies that Terraform can initialize
+- `terraform validate` catches mistakes before deployment
+
+I did not include `terraform plan` yet because that requires AWS credentials. I wanted the first version of the pipeline to work without storing secrets in GitHub.
+
+## Why GitHub Actions?
+
+I chose GitHub Actions because the project is already hosted on GitHub, so it was the easiest way to build a CI/CD pipeline without setting up another tool like Jenkins.
+
+GitHub Actions works well for smaller projects and is quick to configure. Jenkins would allow more customization, but would require more setup and maintenance.
+
+## Tradeoffs
+
+There were a few tradeoffs in the current version of the pipeline:
+
+- Using `terraform init -backend=false` means the workflow can run without AWS credentials, but it does not test a remote backend
+- Leaving out `terraform plan` keeps the setup simple, but it also means the workflow does not show exactly what infrastructure changes would happen
+- GitHub Actions is easy to use and maintain, but tools like Jenkins provide more advanced features
 
 ## Project Structure
 
@@ -54,77 +53,26 @@ terraform-ci-cd-pipeline/
 └── README.md
 ```
 
-## Example GitHub Actions Result
-
-After pushing changes, the GitHub Actions workflow should complete successfully with:
-
-- Terraform Format Check ✅
-- Terraform Init ✅
-- Terraform Validate ✅
-
-You can add a screenshot of the successful Actions run below this section.
-
-## Why This Project Matters
+## What This Project Demonstrates
 
 This project demonstrates:
 
 - Terraform fundamentals
-- CI/CD pipelines
-- GitHub Actions
-- AWS infrastructure automation
-- Infrastructure validation before deployment
-
-These are common skills used in cloud engineering and DevOps roles.
-
-## Design Decisions & Tradeoffs
-
-### Why GitHub Actions?
-
-I chose GitHub Actions because the project is already hosted on GitHub, making it the simplest way to build a CI/CD pipeline without maintaining additional infrastructure.
-
-Tradeoff:
-- GitHub Actions is easy to set up and integrates directly with the repository
-- Alternatives like Jenkins provide more customization, but require additional setup and maintenance
-
-### Why use `terraform fmt`, `terraform init`, and `terraform validate`?
-
-I started with these commands because they provide the most important checks early in the pipeline:
-
-- `terraform fmt -check` ensures consistent formatting
-- `terraform init -backend=false` confirms Terraform can initialize correctly
-- `terraform validate` catches configuration and syntax errors before deployment
-
-Tradeoff:
-- The pipeline stays simple and reliable
-- It does not yet show the exact infrastructure changes that `terraform plan` would provide
-
-### Why use `terraform init -backend=false`?
-
-The pipeline currently runs without AWS credentials configured in GitHub Secrets. Using `-backend=false` allows Terraform to initialize without attempting to connect to an AWS backend.
-
-Tradeoff:
-- The pipeline works immediately without storing AWS credentials
-- Remote state and backend validation are not included yet
-
-### Why not add `terraform plan` yet?
-
-`terraform plan` requires AWS credentials. I intentionally left it out in the first version so the CI/CD pipeline could run successfully without secrets.
-
-Tradeoff:
-- Easier and safer initial implementation
-- Less visibility into the exact infrastructure changes
+- Infrastructure as Code
+- CI/CD with GitHub Actions
+- Automated validation of infrastructure changes
+- Basic AWS infrastructure managed through Terraform
 
 ## Future Improvements
 
-Planned enhancements:
+Some next steps I plan to add:
 
-- Add AWS credentials using GitHub Secrets
+- Store AWS credentials securely with GitHub Secrets
 - Add `terraform plan`
 - Add `terraform apply`
-- Add remote Terraform state in S3
-- Add architecture diagram
-- Add support for multiple environments (`dev`, `prod`)
-- Add Terraform linting with `tflint`
+- Configure remote Terraform state in S3
+- Add support for multiple environments such as `dev` and `prod`
+- Add `tflint` for additional Terraform linting
 
 ## Technologies Used
 
@@ -132,7 +80,3 @@ Planned enhancements:
 - AWS
 - GitHub Actions
 - YAML
-
----
-
-Created by Zonique Foyle
