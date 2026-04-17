@@ -6,22 +6,22 @@ This project demonstrates how Infrastructure as Code can be automatically checke
 
 ## Features
 
-* Automated Terraform validation with GitHub Actions
-* Runs on every push and pull request to `main`
-* Checks Terraform formatting
-* Initializes Terraform
-* Validates Terraform configuration
-* Uses Infrastructure as Code best practices
+- Automated Terraform validation with GitHub Actions
+- Runs on every push and pull request to `main`
+- Checks Terraform formatting
+- Initializes Terraform
+- Validates Terraform configuration
+- Uses Infrastructure as Code best practices
 
 ## Infrastructure Created
 
 This Terraform project provisions:
 
-* AWS VPC
-* DNS support
-* DNS hostnames
-* Tagged infrastructure resources
-* Terraform outputs
+- AWS VPC
+- DNS support
+- DNS hostnames
+- Tagged infrastructure resources
+- Terraform outputs
 
 ## GitHub Actions Workflow
 
@@ -33,7 +33,7 @@ terraform init -backend=false
 terraform validate
 ```
 
-### Workflow Steps
+## Workflow Steps
 
 1. Checkout repository
 2. Install Terraform
@@ -58,9 +58,9 @@ terraform-ci-cd-pipeline/
 
 After pushing changes, the GitHub Actions workflow should complete successfully with:
 
-* Terraform Format Check ✅
-* Terraform Init ✅
-* Terraform Validate ✅
+- Terraform Format Check ✅
+- Terraform Init ✅
+- Terraform Validate ✅
 
 You can add a screenshot of the successful Actions run below this section.
 
@@ -68,32 +68,70 @@ You can add a screenshot of the successful Actions run below this section.
 
 This project demonstrates:
 
-* Terraform fundamentals
-* CI/CD pipelines
-* GitHub Actions
-* AWS infrastructure automation
-* Infrastructure validation before deployment
+- Terraform fundamentals
+- CI/CD pipelines
+- GitHub Actions
+- AWS infrastructure automation
+- Infrastructure validation before deployment
 
 These are common skills used in cloud engineering and DevOps roles.
+
+## Design Decisions & Tradeoffs
+
+### Why GitHub Actions?
+
+I chose GitHub Actions because the project is already hosted on GitHub, making it the simplest way to build a CI/CD pipeline without maintaining additional infrastructure.
+
+Tradeoff:
+- GitHub Actions is easy to set up and integrates directly with the repository
+- Alternatives like Jenkins provide more customization, but require additional setup and maintenance
+
+### Why use `terraform fmt`, `terraform init`, and `terraform validate`?
+
+I started with these commands because they provide the most important checks early in the pipeline:
+
+- `terraform fmt -check` ensures consistent formatting
+- `terraform init -backend=false` confirms Terraform can initialize correctly
+- `terraform validate` catches configuration and syntax errors before deployment
+
+Tradeoff:
+- The pipeline stays simple and reliable
+- It does not yet show the exact infrastructure changes that `terraform plan` would provide
+
+### Why use `terraform init -backend=false`?
+
+The pipeline currently runs without AWS credentials configured in GitHub Secrets. Using `-backend=false` allows Terraform to initialize without attempting to connect to an AWS backend.
+
+Tradeoff:
+- The pipeline works immediately without storing AWS credentials
+- Remote state and backend validation are not included yet
+
+### Why not add `terraform plan` yet?
+
+`terraform plan` requires AWS credentials. I intentionally left it out in the first version so the CI/CD pipeline could run successfully without secrets.
+
+Tradeoff:
+- Easier and safer initial implementation
+- Less visibility into the exact infrastructure changes
 
 ## Future Improvements
 
 Planned enhancements:
 
-* Add AWS credentials using GitHub Secrets
-* Add `terraform plan`
-* Add `terraform apply`
-* Add remote Terraform state in S3
-* Add architecture diagram
-* Add support for multiple environments (`dev`, `prod`)
-* Add Terraform linting with `tflint`
+- Add AWS credentials using GitHub Secrets
+- Add `terraform plan`
+- Add `terraform apply`
+- Add remote Terraform state in S3
+- Add architecture diagram
+- Add support for multiple environments (`dev`, `prod`)
+- Add Terraform linting with `tflint`
 
 ## Technologies Used
 
-* Terraform
-* AWS
-* GitHub Actions
-* YAML
+- Terraform
+- AWS
+- GitHub Actions
+- YAML
 
 ---
 
